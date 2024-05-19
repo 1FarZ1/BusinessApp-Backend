@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "0+PiJgBMSsF6dNqM7BgsflmLNh4Wbj/WYNN8SXLWac0=",
+  "Source": "test",
+  "BasePath": "_content/test",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "test\\wwwroot",
+      "Source": "test",
+      "ContentRoot": "C:\\Users\\fares\\Desktop\\Backend-Goru\\.net\\test\\wwwroot\\",
+      "BasePath": "_content/test",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
