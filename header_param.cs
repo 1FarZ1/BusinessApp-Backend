@@ -14,7 +14,7 @@ namespace MyAPI
             var isAuthorized = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is AuthorizeFilter);
             var allowAnonymous = filterPipeline.Select(filterInfo => filterInfo.Filter).Any(filter => filter is IAllowAnonymousFilter);
 
-            if (isAuthorized && !allowAnonymous)
+            if (isAuthorized && !allowAnonymous || true)
             {
                 if (operation.Parameters == null)
                     operation.Parameters = new List<OpenApiParameter>();

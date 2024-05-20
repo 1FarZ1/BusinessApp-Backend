@@ -5,7 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI;
@@ -31,12 +33,31 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
             }
         );
         
-        builder.Services.AddAuthorization();
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
                 new MySqlServerVersion(new Version(8, 0, 21))
 ));
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders()
+            .AddApiEndpoints()
+            .AddUserManager<UserManager<IdentityUser>>()
+            .AddSignInManager<SignInManager<IdentityUser>>()
+            .AddRoles<IdentityRole>()
+            .AddRoleManager<RoleManager<IdentityRole>>()
+            ;
+
+
+        builder.Services.AddAuthorization();
+        builder.Services.AddAuthentication(
+            options =>
+            {
+             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+        )
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -50,18 +71,24 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
                 };
             });
-
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders()
-            .AddApiEndpoints()
-            .AddUserManager<UserManager<IdentityUser>>()
-            .AddSignInManager<SignInManager<IdentityUser>>()
-            .AddRoles<IdentityRole>()
-            .AddRoleManager<RoleManager<IdentityRole>>()
-            ;
         builder.Services.AddScoped<IAuthService, AuthService>();
-        builder.Services.AddControllers();
+        // allow all cors
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: "AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+        });
+        builder.Services.AddControllers(
+        //     opt => {
+        //     var policy = new AuthorizationPolicyBuilder("Bearer").RequireAuthenticatedUser().Build();
+        //     opt.Filters.Add(new AuthorizeFilter(policy));
+        // }
+        );
         builder.Services.AddLogging();
         WebApplication? app = builder.Build();
         /**     before app run   **/
@@ -75,20 +102,16 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
         app.UseHttpsRedirection();
 
         app.MapControllers();
-
+        app.UseCors("AllowAll");
         // prefix the check with api
 
-        RouteGroupBuilder baseApp = app.MapGroup("/api");
-
-        baseApp.MapGet(pattern: "/check",(ClaimsPrincipal user) =>{
-            if(user != null && user.Identity.IsAuthenticated){
-                    // log user in
-                    Console.WriteLine("User is authenticated" + user.Identity.Name);
-
-                return Results.Ok("Authenticated");
-            }
-            return Results.Unauthorized();
-        } );
+        // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
+        // hello world
+        app.MapGet("/", () => Results.Ok("Hello World!"));
+        app.MapGet(pattern: "/check",(ClaimsPrincipal user) =>{
+        // return the user object
+        return Results.Ok(user.Identity.Name);
+        } ).RequireAuthorization();
         // app.MapIdentityApi<IdentityUser>();
         app.Run();
     }

@@ -51,4 +51,25 @@ public class AuthService : IAuthService
 
         return null;
     }
+
+    public async Task<IdentityUser> GetUserFromTokenAsync(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+        tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = _configuration["JwtSettings:Issuer"],
+            ValidAudience = _configuration["JwtSettings:Audience"],
+            ValidateLifetime = true
+        }, out SecurityToken validatedToken);
+
+        var jwtToken = (JwtSecurityToken)validatedToken;
+        var username = jwtToken.Claims.First(claim => claim.Type == "sub").Value;
+        Console.WriteLine(username);
+        return await _userManager.FindByNameAsync(username);
+    }
 }
