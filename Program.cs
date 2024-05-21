@@ -100,13 +100,12 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
         // app.UseStaticFiles();
         app.UseDeveloperExceptionPage();
         app.UseHttpsRedirection();
-
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
         app.UseCors("AllowAll");
-        // prefix the check with api
 
         // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
-        // hello world
         app.MapGet("/", () => Results.Ok("Hello World!"));
         app.MapGet(pattern: "/check",(ClaimsPrincipal user) =>{
         // return the user object
