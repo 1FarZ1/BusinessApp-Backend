@@ -72,6 +72,7 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
                 };
             });
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IProductService, ProductService>();
         // allow all cors
         builder.Services.AddCors(options =>
         {
@@ -107,11 +108,10 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
 
         // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
         app.MapGet("/", () => Results.Ok("Hello World!"));
-        app.MapGet(pattern: "/check",(ClaimsPrincipal user) =>{
-        // return the user object
+        app.MapGet(pattern: "/api/check",(ClaimsPrincipal user) =>{
         return Results.Ok(user.Identity.Name);
         } ).RequireAuthorization();
-        // app.MapIdentityApi<IdentityUser>();
+        app.MapIdentityApi<IdentityUser>();
         app.Run();
     }
 }

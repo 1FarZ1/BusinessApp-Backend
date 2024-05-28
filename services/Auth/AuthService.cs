@@ -21,7 +21,7 @@ public class AuthService : IAuthService
     public async Task<IdentityResult> RegisterUserAsync(RegisterModel model)
     {
         var user = new IdentityUser { UserName = model.Username, Email = model.Email };
-        var result = await _userManager.CreateAsync(user, model.Password);
+        var result = await _userManager.CreateAsync(user: user, model.Password);
         return result;
     }
 

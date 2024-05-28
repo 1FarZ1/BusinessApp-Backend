@@ -8,5 +8,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         : base(options)
     {
     }
-    // public DbSet<User> Users { get; set; }
+
+    // products
+    public DbSet<ProductModel> Products { get; set; }
+
 }
