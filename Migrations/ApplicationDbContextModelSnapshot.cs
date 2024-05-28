@@ -236,7 +236,7 @@ namespace test.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 

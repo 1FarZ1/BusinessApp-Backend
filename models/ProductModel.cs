@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class ProductModel
 {
@@ -21,5 +22,6 @@ public class ProductModel
     [Required]
     [Range(0.01, 1000000)]
     [DataType(DataType.Currency)]
+    [Column(TypeName = "decimal(18, 2)")]
     public decimal Price { get; set; }
 }
