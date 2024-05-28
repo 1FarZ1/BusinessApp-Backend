@@ -8,7 +8,7 @@ public class ProductController : ControllerBase
     private readonly IProductService _productService;
 
     public ProductController( IProductService productService)
-    {
+    { 
         _productService = productService;
     }
 
@@ -38,14 +38,21 @@ public class ProductController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct([FromBody] ProductModel product)
+    public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
     {
-        ProductModel? newProduct = await _productService.AddProductAsync(product);
-        return CreatedAtAction(nameof(GetProduct), new { id = newProduct.Id }, newProduct);
+        try
+        {
+            ProductModel? newProduct = await _productService.AddProductAsync(product);
+            return Ok(value: newProduct);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductModel product)
+    public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto product)
     {
         try
         {

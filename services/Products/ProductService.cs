@@ -22,14 +22,21 @@ public class ProductService  : IProductService
         return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<ProductModel> AddProductAsync(ProductModel product)
+    public async Task<ProductModel> AddProductAsync( ProductDto productDto)
     {
-        _context.Products.Add(product);
+        var product = new ProductModel
+        {
+            Name = productDto.Name,
+            Description = productDto.Description,
+            Price = productDto.Price
+        };
+
+        await _context.Products.AddAsync(product);
         await _context.SaveChangesAsync();
         return product;
     }
 
-    public async Task<ProductModel> UpdateProductAsync(int id, ProductModel product)
+    public async Task<ProductModel> UpdateProductAsync(int id, ProductDto product)
     {
         var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
         if (existingProduct == null)

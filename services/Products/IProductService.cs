@@ -5,7 +5,7 @@ public interface IProductService
 {
     Task<ProductModel[]> GetProductsAsync();
     Task<ProductModel?> GetProductAsync(int id);
-    Task<ProductModel> AddProductAsync(ProductModel product);
-    Task<ProductModel> UpdateProductAsync(int id, ProductModel product);
+    Task<ProductModel> AddProductAsync(ProductDto product);
+    Task<ProductModel> UpdateProductAsync(int id, ProductDto product);
     Task<bool> DeleteProductAsync(int id);
 }
