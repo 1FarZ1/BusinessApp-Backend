@@ -2,19 +2,24 @@
 
 - A Simple Business App Api made with Asp.Net Core 8.0  and Entity Framework Core
 
-## features
+## Features
 
 - Login and Register
 - Forgot Password
 - Reset Password
 - 2fa Authentication
 - Email Confirmation
+- Get User Profile
+- Update User Profile
+- Complex Get Products with Pagination, Filtering, Sorting, and Searching
+- Complex Get Orders with Pagination, Filtering, Sorting, and Searching
 - Crud Products
 - Crud Categories
 - Crud Orders
 - Crud Users
-- Support and Ticket System
 - Crud Services
+- Cart System
+- Support and Ticket System
 
 ## Configuration
 
