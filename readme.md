@@ -2,6 +2,15 @@
 
 - A Simple Business App Api made with Asp.Net Core 8.0  and Entity Framework Core
 
+## Tools
+
+- Asp.Net Core 8.0
+- Entity Framework Core
+- Nuget
+- Visual Studio Code
+- Identity
+- mySql
+
 ## Features
 
 - Login and Register
@@ -26,6 +35,11 @@
 - Clone the repository
 - Open the project in Visual Studio
 - Run the project
+
+``` bash
+dotnet run --launch-profile https
+```
+
 - Update the database with the following commands
 
 ```bash
