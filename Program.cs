@@ -45,6 +45,7 @@ internal class Program
             .AddSignInManager<SignInManager<IdentityUser>>()
             .AddRoles<IdentityRole>()
             .AddRoleManager<RoleManager<IdentityRole>>()
+            
             ;
 
 
@@ -72,6 +73,7 @@ internal class Program
             });
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IProductService, ProductService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
         // allow all cors
         builder.Services.AddCors(options =>
         {
@@ -91,7 +93,7 @@ internal class Program
         );
         builder.Services.AddLogging();
         WebApplication? app = builder.Build();
-        
+
         /**     before app run   **/
         if (app.Environment.IsDevelopment())
         {

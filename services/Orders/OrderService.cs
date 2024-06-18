@@ -29,40 +29,68 @@ public class OrderService : IOrderService
     }
 
 
+public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, int userId)
+{
+    using var transaction = await _context.Database.BeginTransactionAsync();
 
-    
-    public async Task<OrderModel> AddOrderAsync(OrderDto orderDto)
-    {   // get the user 
+    try
+    {
+        decimal total = 0;
+        var orderItems = new List<OrderItemModel>();
+
+        foreach (var item in orderDto.OrderItems)
+        {
+            var product = await _context.Products.SingleOrDefaultAsync(p => p.Id == item.ProductId);
+            if (product == null)
+            {
+                throw new InvalidOperationException("Product not found");
+            }
+
+            total += product.Price * item.Quantity;
+
+            orderItems.Add(new OrderItemModel
+            {
+                ProductId = item.ProductId,
+                Quantity = item.Quantity
+            });
+        }
 
         var order = new OrderModel
         {
-                Total = orderDto.Total,
-                // order date , date.now
-                OrderDate = DateTime.Now,
-                // order status1
-            
+            OrderItems = orderItems.ToArray(),
+            Total = total,
+            UserId = userId
         };
 
         await _context.Orders.AddAsync(order);
         await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
         return order;
     }
-
-    public async Task<OrderModel> UpdateOrderAsync(int id, OrderDto order)
+    catch
     {
-        var existingOrder = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
-        if (existingOrder == null)
-        {
-            throw new Exception("Order not found");
-        }
-
-        existingOrder.Name = order.Name;
-        existingOrder.Description = order.Description;
-        existingOrder.Price = order.Price;
-
-        await _context.SaveChangesAsync();
-        return existingOrder;
+        await transaction.RollbackAsync();
+        throw;
     }
+}
+
+    // public async Task<OrderModel> UpdateOrderAsync(int id, OrderDto order)
+    // {
+    //     var existingOrder = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
+    //     if (existingOrder == null)
+    //     {
+    //         throw new Exception("Order not found");
+    //     }
+
+    //     existingOrder.Name = order.Name;
+    //     existingOrder.Description = order.Description;
+    //     existingOrder.Price = order.Price;
+
+    //     await _context.SaveChangesAsync();
+    //     return existingOrder;
+    // }
 
     public async Task<bool> DeleteOrderAsync(int id)
     {

@@ -61,11 +61,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             modelBuilder.Entity<OrderItemModel>().HasKey(o => o.Id);
             modelBuilder.Entity<OrderItemModel>().Property(o => o.Id).ValueGeneratedOnAdd();
             modelBuilder.Entity<OrderItemModel>().Property(o => o.Quantity).IsRequired();
-            modelBuilder.Entity<OrderItemModel>().Property(o => o.Price).IsRequired();
+            // modelBuilder.Entity<OrderItemModel>().Property(o => o.Price).IsRequired();
             modelBuilder.Entity<OrderItemModel>().Property(o => o.ProductId).IsRequired();
             modelBuilder.Entity<OrderItemModel>().Property(o => o.OrderId).IsRequired();
             modelBuilder.Entity<OrderItemModel>().HasOne(o => o.Product).WithMany(p => p.OrderItems).HasForeignKey(o => o.ProductId);
-            modelBuilder.Entity<OrderItemModel>().HasOne(o => o.Order).WithMany(o => o.OrderItems).HasForeignKey(o => o.OrderId);
+            modelBuilder.Entity<OrderItemModel>().HasOne(navigationExpression: o => o.Order).WithMany(o => o.OrderItems).HasForeignKey(o => o.OrderId);
     
         }
 
