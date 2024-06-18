@@ -106,9 +106,10 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
         app.MapControllers();
         app.UseCors("AllowAll");
 
+
         // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
-        app.MapGet("/", () => Results.Ok("Hello World!"));
-        app.MapGet(pattern: "/api/check",(ClaimsPrincipal user) =>{
+        app.MapGet("/", handler: () => Results.Ok("Hello World!"));
+        app.MapGet(pattern: "/api/check",handler: (ClaimsPrincipal user) =>{
         return Results.Ok(user.Identity.Name);
         } ).RequireAuthorization();
         app.MapIdentityApi<IdentityUser>();
