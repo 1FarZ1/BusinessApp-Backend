@@ -22,21 +22,20 @@ internal class Program
         builder.Services.AddHealthChecks();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(
-            c=>{
-c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
-  c.SwaggerDoc(name: "v1", new Microsoft.OpenApi.Models.OpenApiInfo()
-    {
-        Title = "Btp Win",
-        Version = "v1",
-        Description = "Btp Win API",
-    });
+            c =>
+            {
+                c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+                c.SwaggerDoc(name: "v1", new Microsoft.OpenApi.Models.OpenApiInfo()
+                {
+                    Title = "Btp Win",
+                    Version = "v1",
+                    Description = "Btp Win API",
+                });
             }
         );
-        
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), 
-                new MySqlServerVersion(new Version(8, 0, 21))
-));
+            options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+                new MySqlServerVersion(new Version(8, 0, 21))));
 
         builder.Services.AddIdentity<IdentityUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -53,7 +52,7 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
         builder.Services.AddAuthentication(
             options =>
             {
-             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }
@@ -92,6 +91,7 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
         );
         builder.Services.AddLogging();
         WebApplication? app = builder.Build();
+        
         /**     before app run   **/
         if (app.Environment.IsDevelopment())
         {
@@ -109,9 +109,10 @@ c.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
 
         // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
         app.MapGet("/", handler: () => Results.Ok("Hello World!"));
-        app.MapGet(pattern: "/api/check",handler: (ClaimsPrincipal user) =>{
-        return Results.Ok(user.Identity.Name);
-        } ).RequireAuthorization();
+        app.MapGet(pattern: "/api/check", handler: (ClaimsPrincipal user) =>
+        {
+            return Results.Ok(user.Identity.Name);
+        }).RequireAuthorization();
         app.MapIdentityApi<IdentityUser>();
         app.Run();
     }

@@ -14,15 +14,33 @@ public class ProductController : ControllerBase
 
 
     [HttpGet("")]
-    public async Task<IActionResult> GetProducts()
+    public async Task<IActionResult> GetProducts(
+        [FromQuery] int pageIndex = 1,
+        [FromQuery] int pageSize = 10
+    )
     {
-        ProductModel[]? products = await _productService.GetProductsAsync();
+        ProductModel[]? products = await _productService.GetProductsAsync(
+            pageIndex,
+            pageSize
+        );
         if (products == null)
         {
             return NotFound();
         }
         return Ok(products);
 
+    }
+
+    //search
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string query)
+    {
+        ProductModel[]? products = await _productService.SearchProductsAsync(query);
+        if (products == null)
+        {
+            return NotFound();
+        }
+        return Ok(products);
     }
 
     [HttpGet("{id}")]
@@ -35,6 +53,8 @@ public class ProductController : ControllerBase
         }
         return Ok(product);
     }
+
+    
 
 
     [HttpPost]

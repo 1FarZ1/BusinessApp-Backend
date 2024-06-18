@@ -2,6 +2,8 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+
 
 public class ProductService  : IProductService
 {
@@ -12,10 +14,15 @@ public class ProductService  : IProductService
         _context = context;
     }
 
-    public async Task<ProductModel[]> GetProductsAsync()
-    {
-        return await _context.Products.ToArrayAsync();
-    }
+ public async Task<ProductModel[]> GetProductsAsync(int pageIndex, int pageSize)
+{
+    var products = await _context.Products
+        .OrderBy(p => p.Name)
+        .Skip((pageIndex - 1) * pageSize)
+        .Take(pageSize)
+        .ToArrayAsync();
+    return products;
+}
 
     public async Task<ProductModel?> GetProductAsync(int id)
     {
@@ -63,5 +70,12 @@ public class ProductService  : IProductService
         _context.Products.Remove(existingProduct);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<ProductModel[]> SearchProductsAsync(string query)
+    {
+        return await _context.Products
+            .Where(p => p.Name.Contains(query) || p.Description.Contains(query))
+            .ToArrayAsync();
     }
 }
