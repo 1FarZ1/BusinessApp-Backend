@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Identity;
 public interface  IOrderService
 {
     Task<OrderModel[]> GetOrdersAsync(int pageIndex, int pageSize);
+
+    Task<OrderModel[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize);
     Task<OrderModel?> GetOrderAsync(int id);
-    Task<OrderModel> AddOrderAsync(OrderDto order, int userId);
+    Task<OrderModel> AddOrderAsync(OrderDto order, string userId);
     // Task<OrderModel> UpdateOrderAsync(int id, OrderDto order);
     Task<bool> DeleteOrderAsync(int id);
 

@@ -31,7 +31,7 @@ public class OrderModel
     public DateTime OrderDate { get; set; } = DateTime.Now;
 
     [Required]
-    public required int UserId { get; set; }
+    public required string UserId { get; set; }
 
     [ForeignKey("UserId")]
     public  UserModel User { get; set; }

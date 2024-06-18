@@ -37,12 +37,12 @@ internal class Program
             options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
                 new MySqlServerVersion(new Version(8, 0, 21))));
 
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+        builder.Services.AddIdentity<UserModel, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddApiEndpoints()
-            .AddUserManager<UserManager<IdentityUser>>()
-            .AddSignInManager<SignInManager<IdentityUser>>()
+            .AddUserManager<UserManager<UserModel>>()
+            .AddSignInManager<SignInManager<UserModel>>()
             .AddRoles<IdentityRole>()
             .AddRoleManager<RoleManager<IdentityRole>>()
             
@@ -115,7 +115,7 @@ internal class Program
         {
             return Results.Ok(user.Identity.Name);
         }).RequireAuthorization();
-        app.MapIdentityApi<IdentityUser>();
+        app.MapIdentityApi<UserModel>();
         app.Run();
     }
 }

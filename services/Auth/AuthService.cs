@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<UserModel> _userManager;
     private readonly IConfiguration _configuration;
 
-    public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration)
+    public AuthService(UserManager<UserModel> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -20,7 +20,7 @@ public class AuthService : IAuthService
 
     public async Task<IdentityResult> RegisterUserAsync(RegisterModel model)
     {
-        var user = new IdentityUser { UserName = model.Username, Email = model.Email };
+        var user = new UserModel { UserName = model.Username, Email = model.Email };
         var result = await _userManager.CreateAsync(user: user, model.Password);
         return result;
     }
@@ -52,7 +52,7 @@ public class AuthService : IAuthService
         return null;
     }
 
-    public async Task<IdentityUser> GetUserFromTokenAsync(string token)
+    public async Task<UserModel> GetUserFromTokenAsync(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);

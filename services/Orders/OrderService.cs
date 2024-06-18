@@ -28,8 +28,18 @@ public class OrderService : IOrderService
         return await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
     }
 
+    public async Task<OrderModel[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize)
+    {
+        var orders = await _context.Orders
+            .Where(p => p.UserId == userId)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToArrayAsync();
+        return orders;
+    }
 
-public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, int userId)
+
+public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
 {
     using var transaction = await _context.Database.BeginTransactionAsync();
 

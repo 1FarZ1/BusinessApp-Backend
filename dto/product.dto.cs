@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 public class ProductDto
 {
@@ -17,4 +18,7 @@ public class ProductDto
     [Range(0.01, 1000000)]
 
     public decimal Price { get; set; } 
+
+    public string? ImageUrl { get; set; }
+
 }
