@@ -8,6 +8,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Http;
+
 
 
 // jwt  payload
@@ -28,6 +30,8 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<UserModel> _userManager;
     private readonly IJwtService    _jwtService;
+
+
     public AuthService(UserManager<UserModel> userManager, IJwtService jwtService)
     {
         _userManager = userManager;
@@ -43,6 +47,23 @@ public class AuthService : IAuthService
             return result;
 
     }
+
+    public async Task<bool> AssignRole(string userId, string role)
+{
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null)
+    {
+        throw new Exception("User not found");
+    }
+
+    var result = await _userManager.AddToRoleAsync(user, role);
+    if (result.Succeeded)
+    {
+        return  true;
+    }
+
+    return      false;
+}
 
 #pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
     public async Task<string?> LoginUserAsync(
@@ -60,7 +81,13 @@ public class AuthService : IAuthService
             }
 
             var payload = new JwtPayloadModel { sub = user.UserName, email = user.Email };
+            var roles =  await  _userManager.GetRolesAsync(user);
 
+            Console.WriteLine(roles.Count);
+            for (int i = 0; i < roles.Count; i++)
+            {
+                    Console.WriteLine(roles[i]);
+                }
             return _jwtService.GenerateToken(
                 payload
             );
@@ -69,7 +96,10 @@ public class AuthService : IAuthService
         {
             return null;
         }
+
+        
     }
+    
 
     // public async Task<UserModel> GetUserFromTokenAsync(string token)
     // {

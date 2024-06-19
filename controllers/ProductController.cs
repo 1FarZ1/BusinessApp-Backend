@@ -13,6 +13,7 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
+    // [Authorize]
     [HttpGet("")]
     public async Task<IActionResult> GetProducts(
         [FromQuery] int pageIndex = 1,
@@ -57,7 +58,7 @@ public class ProductController : ControllerBase
     
 
 
-    [Authorize(policy: "Admin")]
+    // [Authorize(policy: "Admin")]
     [HttpPost]    
     public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
     {

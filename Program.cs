@@ -13,10 +13,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI;
 using MySql.Data.EntityFrameworkCore;
+
+
 internal class Program
 {
-    private static void Main(string[] args)
+    private static  void Main(string[] args)
     {
+
+        
 
         /**  Building **/
         WebApplicationBuilder? builder = WebApplication.CreateBuilder(args);
@@ -57,11 +61,12 @@ internal class Program
         builder.Services.AddIdentity<UserModel, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddUserManager<UserManager<UserModel>>()
-            .AddSignInManager<SignInManager<UserModel>>()
-            .AddRoles<IdentityRole>()
-            .AddRoleManager<RoleManager<IdentityRole>>()
             .AddApiEndpoints()
             .AddDefaultTokenProviders();
+            
+            // .AddSignInManager<SignInManager<UserModel>>()
+            // .AddRoles<IdentityRole>()
+            // .AddRoleManager<RoleManager<IdentityRole>>()
       
 
 
@@ -95,14 +100,21 @@ internal class Program
         builder.Services.AddAuthorization(
             options =>
             {
+
                 options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
                 options.AddPolicy("User", policy => policy.RequireClaim(ClaimTypes.Role, "User"));
+                options.AddPolicy("Seller", policy => policy.RequireClaim(ClaimTypes.Role, "Seller"));
             }
         );
 
 
 
         WebApplication? app = builder.Build();
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var serviceProvider = scope.ServiceProvider;
+        //     SeedRolesAsync(serviceProvider).Wait();
+        // }
 
         /**     before app run   **/
         if (app.Environment.IsDevelopment())
@@ -114,11 +126,29 @@ internal class Program
         // app.UseDeveloperExceptionPage();
         app.UseHttpsRedirection();
         app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseAuthorization(
+        
+        );
         app.MapControllers();
         app.UseCors("AllowAll");
-
         app.MapIdentityApi<UserModel>();
         app.Run();
     }
+
+    public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    var roles = new[] { "Admin", "User", "Seller"};
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
 }
+
+}
+
