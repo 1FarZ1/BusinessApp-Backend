@@ -7,5 +7,5 @@ public interface IAuthService
     Task<string> LoginUserAsync(LoginModel model);
 
     //get user  from a token in headers
-    Task<UserModel> GetUserFromTokenAsync(string token);
+    // Task<UserModel> GetUserFromTokenAsync(string token);
 }

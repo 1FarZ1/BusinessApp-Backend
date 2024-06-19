@@ -46,6 +46,9 @@ public class OrderController : ControllerBase
         [FromQuery] int pageSize = 10
     )
     {
+
+        var username = User.Identity.Name;
+        Console.WriteLine(username);
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)
         {

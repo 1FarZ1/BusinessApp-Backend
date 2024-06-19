@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI;
 using MySql.Data.EntityFrameworkCore;
@@ -37,44 +38,39 @@ internal class Program
             options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
                 new MySqlServerVersion(new Version(8, 0, 21))));
 
+        builder.Services.AddAuthentication(
+            options =>
+            {
+                        options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
+                        options.DefaultChallengeScheme = IdentityConstants.BearerScheme;
+                        options.DefaultSignInScheme = IdentityConstants.BearerScheme;
+                        options.DefaultSignOutScheme = IdentityConstants.BearerScheme;
+                        options.DefaultScheme = IdentityConstants.BearerScheme;
+                        options.DefaultForbidScheme = IdentityConstants.BearerScheme;
+                        
+                }
+
+        ).AddJwtBearer();
+        
+        builder.Services.ConfigureOptions<JwtOptionsSetup>();
+        builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
         builder.Services.AddIdentity<UserModel, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders()
-            .AddApiEndpoints()
             .AddUserManager<UserManager<UserModel>>()
             .AddSignInManager<SignInManager<UserModel>>()
             .AddRoles<IdentityRole>()
             .AddRoleManager<RoleManager<IdentityRole>>()
-            
-            ;
+            .AddApiEndpoints()
+            .AddDefaultTokenProviders();
+      
 
 
-        builder.Services.AddAuthorization();
-        builder.Services.AddAuthentication(
-            options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
-        )
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
-                };
-            });
+     
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
-        // allow all cors
+        builder.Services.AddScoped<IJwtService, JwtService>();
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(name: "AllowAll",
@@ -91,7 +87,21 @@ internal class Program
         //     opt.Filters.Add(new AuthorizeFilter(policy));
         // }
         );
-        builder.Services.AddLogging();
+        // builder.Services.AddLogging();
+
+  
+        
+
+        builder.Services.AddAuthorization(
+            options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+                options.AddPolicy("User", policy => policy.RequireClaim(ClaimTypes.Role, "User"));
+            }
+        );
+
+
+
         WebApplication? app = builder.Build();
 
         /**     before app run   **/
@@ -101,20 +111,13 @@ internal class Program
             app.UseSwaggerUI();
         }
         // app.UseStaticFiles();
-        app.UseDeveloperExceptionPage();
+        // app.UseDeveloperExceptionPage();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
         app.UseCors("AllowAll");
 
-
-        // RouteGroupBuilder baseApp = app.MapGroup(prefix: "/api");
-        app.MapGet("/", handler: () => Results.Ok("Hello World!"));
-        app.MapGet(pattern: "/api/check", handler: (ClaimsPrincipal user) =>
-        {
-            return Results.Ok(user.Identity.Name);
-        }).RequireAuthorization();
         app.MapIdentityApi<UserModel>();
         app.Run();
     }

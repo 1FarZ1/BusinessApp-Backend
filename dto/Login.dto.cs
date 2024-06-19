@@ -6,7 +6,7 @@ public class LoginModel
 
     [Required]
     [EmailAddress]
-    public required string Username { get; set; }
+    public required string email { get; set; }
 
     [Required]
     [DataType(DataType.Password)]

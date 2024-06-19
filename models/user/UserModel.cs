@@ -4,18 +4,7 @@ using Microsoft.AspNetCore.Identity;
 public class UserModel : IdentityUser
 {
 
-    // [Required]
-    // public string Username { get; set; }
 
-    [Required]
-    public string Email { get; set; }
-
-    [Required]
-    public string Password { get; set; }
-
-
-
-    //orders
     public OrderModel[] Orders { get; set; }
 
     // public string PhoneNumber { get; set; }

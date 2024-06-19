@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -11,7 +12,6 @@ public class ProductController : ControllerBase
     { 
         _productService = productService;
     }
-
 
     [HttpGet("")]
     public async Task<IActionResult> GetProducts(
@@ -57,7 +57,8 @@ public class ProductController : ControllerBase
     
 
 
-    [HttpPost]
+    [Authorize(policy: "Admin")]
+    [HttpPost]    
     public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
     {
         try
@@ -71,6 +72,7 @@ public class ProductController : ControllerBase
         }
     }
 
+    [Authorize(policy: "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto product)
     {
@@ -83,8 +85,9 @@ public class ProductController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-    }
+    }   
 
+    [Authorize (policy: "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
