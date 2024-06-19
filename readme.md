@@ -2,6 +2,12 @@
 
 - A Simple Business App Api made with Asp.Net Core 8.0  and Entity Framework Core
 
+## Notes
+
+- This Code Follows Solid Principles and Clean Architecture
+- Aims To Get the best practices in Asp.Net Core
+- Following Design Patterns such as Repository Pattern, Singleton Pattern, Factory Pattern, and Strategy Pattern, Options Pattern, and Mediator Pattern
+
 ## Tools
 
 - Asp.Net Core 8.0
