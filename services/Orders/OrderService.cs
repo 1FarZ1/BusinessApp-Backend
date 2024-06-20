@@ -133,9 +133,27 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
     public async Task<bool> OrderBelongsToSeller(int orderId, string sellerId)
     {   
         //TODO
-        return false;
+        return true;
         // return await _context.Orders.AnyAsync(p => p.Id == orderId && p.User.SellerId == sellerId);
     }
+
+    public async Task<int> GetOrdersCountAsync()
+    {
+        return await _context.Orders.CountAsync();
+    }
+
+    public async Task<int> GetUserOrdersCountAsync(string userId)
+    {
+        return await _context.Orders.CountAsync(p => p.UserId == userId);
+    }
+
+    public async Task<int> GetSellerOrdersCountAsync(string sellerId)
+    {
+        //TODO
+        return 0;
+        // return await _context.Orders.CountAsync(p => p.User.SellerId == sellerId);
+    }
+    
 
 
     public async Task<bool> UpdateOrderStatusAsync(int id, OrderStatus status)
@@ -144,6 +162,36 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
         if (existingOrder == null)
         {
             throw new Exception("Order not found");
+        }
+
+        switch (status)
+        {
+            case OrderStatus.Cancelled:
+                if (existingOrder.OrderStatus == OrderStatus.Shipped)
+                {
+                    throw new InvalidOperationException("Cannot cancel shipped order");
+                }
+                break;
+            case OrderStatus.Shipped:
+                if (existingOrder.OrderStatus == OrderStatus.Cancelled)
+                {
+                    throw new InvalidOperationException("Cannot ship cancelled order");
+                }
+                break;
+            case OrderStatus.Pending:
+                if (existingOrder.OrderStatus == OrderStatus.Shipped)
+                {
+                    throw new InvalidOperationException("Cannot change status of shipped order");
+                }
+                break;
+            case OrderStatus.Processing:
+                if (existingOrder.OrderStatus == OrderStatus.Shipped)
+                {
+                    throw new InvalidOperationException("Cannot change status of shipped order");
+                }
+                break;
+                //TODO: add more cases for other status transitions
+            ;
         }
 
         existingOrder.OrderStatus = status;

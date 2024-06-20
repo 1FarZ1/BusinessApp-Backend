@@ -78,7 +78,7 @@ public class OrderController : ControllerBase
             return Unauthorized();
         }
 
-        OrderModel? order = await _orderService.GetOrderAsync(id); 
+        GetOrderDto? order = await _orderService.GetOrderAsync(id); 
         if (order == null)
         {
             return NotFound();
