@@ -38,7 +38,7 @@ public class JwtService : IJwtService
             new Claim(JwtRegisteredClaimNames.Jti, payload.jti),
         };
 
-        foreach (var role in roles)
+        foreach (string role in roles)
         {
                 claims = claims.Append(new Claim(ClaimTypes.Role, role)).ToArray();
             }

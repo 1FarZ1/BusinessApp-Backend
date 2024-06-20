@@ -5,6 +5,19 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 
+
+public class GetOrderDto {
+    // id , totoal , status , user , orderItems, number of products in order
+    public int Id { get; set;}
+    public decimal Total { get; set;}
+    public OrderStatus Status { get; set;}
+    public string username { get; set;}
+
+    public DateTime OrderDate { get; set;}
+
+    public int NumberOfProducts { get; set;}
+}
+
 public class OrderService : IOrderService
 {
     private readonly ApplicationDbContext _context;
@@ -14,12 +27,26 @@ public class OrderService : IOrderService
         _context = context;
     }
 
-    public async Task<OrderModel[]> GetOrdersAsync(int pageIndex, int pageSize)
+    public async Task<GetOrderDto[]> GetOrdersAsync(int pageIndex, int pageSize)
     {
-        var orders = await _context.Orders
+         GetOrderDto[]?  orders= await _context.Orders
+            .Select(p => new GetOrderDto
+            {
+                Id = p.Id,
+                Total = p.Total,
+                Status = (OrderStatus)p.OrderStatus,
+                username = p.User.UserName,
+                OrderDate = p.OrderDate,
+                NumberOfProducts = p.OrderItems.Count
+            })
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToArrayAsync();
+
+            for (int i = 0; i < orders.Length; i++)
+            {
+                    Console.WriteLine(orders[i].username);
+            }
         return orders;
     }
 
@@ -30,7 +57,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderModel[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize)
     {
-        var orders = await _context.Orders
+        OrderModel[]? orders = await _context.Orders
             .Where(p => p.UserId == userId)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)

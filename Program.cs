@@ -120,7 +120,15 @@ internal class Program
         //     var policy = new AuthorizationPolicyBuilder("Bearer").RequireAuthenticatedUser().Build();
         //     opt.Filters.Add(new AuthorizeFilter(policy));
         // }
-        );
+).AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            options.JsonSerializerOptions.WriteIndented = true;
+            options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            
+        });
+
+
         // builder.Services.AddLogging();
 
   
@@ -139,11 +147,11 @@ internal class Program
 
 
         WebApplication? app = builder.Build();
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var serviceProvider = scope.ServiceProvider;
-        //     SeedRolesAsync(serviceProvider).Wait();
-        // }
+        using (var scope = app.Services.CreateScope())
+        {
+            var serviceProvider = scope.ServiceProvider;
+            SeedRolesAsync(serviceProvider).Wait();
+        }
         // app.UseStaticFiles();
 
         /**     before app run   **/

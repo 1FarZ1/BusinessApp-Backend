@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 
@@ -64,4 +66,19 @@ public class AuthController : ControllerBase
         return BadRequest(new { Message = ex.Message });
     }
     }
+
+
+    // get my role
+    [Authorize]
+    [HttpGet("my-role")]
+    public async Task<IActionResult> GetMyRole()
+    {
+        var role = User.Claims;
+        for (int i = 0; i < role.Count(); i++)
+        {
+            Console.WriteLine(role.ElementAt(i).Value);
+        }
+        return Ok(new { message = "Role retrieved successfully!"});
+    }
+    
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 public interface  IOrderService
 {
-    Task<OrderModel[]> GetOrdersAsync(int pageIndex, int pageSize);
+    Task<GetOrderDto[]> GetOrdersAsync(int pageIndex, int pageSize);
 
     Task<OrderModel[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize);
     Task<OrderModel?> GetOrderAsync(int id);

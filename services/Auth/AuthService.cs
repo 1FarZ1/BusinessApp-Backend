@@ -50,6 +50,14 @@ public class AuthService : IAuthService
     {
         var user = new UserModel { UserName = model.Username, Email = model.Email };
         IdentityResult? result = await _userManager.CreateAsync(user: user, model.Password);
+        // assign role user to him
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddClaimsAsync(user, new Claim[] {
+                new(ClaimTypes.Role, "User")
+            });
+        }
 
             return result;
 
@@ -66,6 +74,9 @@ public class AuthService : IAuthService
     var result = await _userManager.AddToRoleAsync(user, role);
     if (result.Succeeded)
     {
+        await _userManager.AddClaimsAsync(user, new Claim[] {
+            new(ClaimTypes.Role, role)
+        });
         return  true;
     }
 
@@ -89,10 +100,16 @@ public class AuthService : IAuthService
 
             var roles =  await  _userManager.GetRolesAsync(user);
 
-            var payload = new JwtPayloadModel { sub = user.UserName, email = user.Email , jti = Guid.NewGuid().ToString(), roles = roles.ToArray()};
-            await _userManager.AddClaimsAsync(user, new Claim[] {
-                new Claim(ClaimTypes.Role, roles[0])
-            });
+            var payload = new JwtPayloadModel { sub = user.Id, email = user.Email , jti = Guid.NewGuid().ToString(), roles = roles.ToArray()};
+
+
+            if (roles.Count != 0)
+            {
+            // await _userManager.AddClaimsAsync(user: user, new Claim[] {
+            //     new Claim(type: ClaimTypes.Role, roles[index: 0])
+            // });
+                
+            }
             // _userManager.getrole
             return _jwtService.GenerateToken(
                 payload
