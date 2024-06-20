@@ -19,6 +19,13 @@ public class JwtPayloadModel {
     public required string sub { get; set; }
 
     public required string email { get; set; }
+
+
+    public required string jti { get; set; }
+
+
+    // list of roles
+    public required string[] roles { get; set; }
 }
 
 public class LoginResponse {
@@ -62,7 +69,7 @@ public class AuthService : IAuthService
         return  true;
     }
 
-    return      false;
+    return   false;
 }
 
 #pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
@@ -80,14 +87,13 @@ public class AuthService : IAuthService
                 return null;
             }
 
-            var payload = new JwtPayloadModel { sub = user.UserName, email = user.Email };
             var roles =  await  _userManager.GetRolesAsync(user);
 
-            Console.WriteLine(roles.Count);
-            for (int i = 0; i < roles.Count; i++)
-            {
-                    Console.WriteLine(roles[i]);
-                }
+            var payload = new JwtPayloadModel { sub = user.UserName, email = user.Email , jti = Guid.NewGuid().ToString(), roles = roles.ToArray()};
+            await _userManager.AddClaimsAsync(user, new Claim[] {
+                new Claim(ClaimTypes.Role, roles[0])
+            });
+            // _userManager.getrole
             return _jwtService.GenerateToken(
                 payload
             );

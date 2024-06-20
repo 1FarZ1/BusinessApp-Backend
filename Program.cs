@@ -42,28 +42,57 @@ internal class Program
             options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
                 new MySqlServerVersion(new Version(8, 0, 21))));
 
-        builder.Services.AddAuthentication(
-            options =>
-            {
-                        options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
-                        options.DefaultChallengeScheme = IdentityConstants.BearerScheme;
-                        options.DefaultSignInScheme = IdentityConstants.BearerScheme;
-                        options.DefaultSignOutScheme = IdentityConstants.BearerScheme;
-                        options.DefaultScheme = IdentityConstants.BearerScheme;
-                        options.DefaultForbidScheme = IdentityConstants.BearerScheme;
-                        
-                }
-
-        ).AddJwtBearer();
-        
-        builder.Services.ConfigureOptions<JwtOptionsSetup>();
-        builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
         builder.Services.AddIdentity<UserModel, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddUserManager<UserManager<UserModel>>()
             .AddApiEndpoints()
             .AddDefaultTokenProviders();
-            
+
+                builder.Services.ConfigureOptions<JwtOptionsSetup>();
+        builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+          
+        builder.Services.AddAuthentication(
+            options =>
+            {
+ options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                        
+                }
+
+        ).AddJwtBearer(
+                options =>
+                {
+                     options.SaveToken = true;
+                     options.RequireHttpsMetadata = false;
+                     options.TokenValidationParameters = new TokenValidationParameters
+                     {
+                         ValidateIssuer = true,
+                         ValidateAudience = true,
+                         ValidateLifetime = true,
+                         ValidateIssuerSigningKey = true,
+                         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                         ValidAudience = builder.Configuration[key: "JwtSettings:Audience"],
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]))
+                     };
+    //                 options.Events = new JwtBearerEvents
+    // {
+    //     OnAuthenticationFailed = context =>
+    //     {
+    //         Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+    //         return Task.CompletedTask;
+    //     },
+    //     OnTokenValidated = context =>
+    //     {
+    //         Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+    //         return Task.CompletedTask;
+    //     }
+    // };
+    }
+                      
+        );  
+        
+      
             // .AddSignInManager<SignInManager<UserModel>>()
             // .AddRoles<IdentityRole>()
             // .AddRoleManager<RoleManager<IdentityRole>>()
@@ -115,6 +144,7 @@ internal class Program
         //     var serviceProvider = scope.ServiceProvider;
         //     SeedRolesAsync(serviceProvider).Wait();
         // }
+        // app.UseStaticFiles();
 
         /**     before app run   **/
         if (app.Environment.IsDevelopment())
@@ -122,15 +152,12 @@ internal class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        // app.UseStaticFiles();
-        // app.UseDeveloperExceptionPage();
+        app.UseDeveloperExceptionPage();
+        app.UseCors("AllowAll");
         app.UseHttpsRedirection();
         app.UseAuthentication();
-        app.UseAuthorization(
-        
-        );
+        app.UseAuthorization();
         app.MapControllers();
-        app.UseCors("AllowAll");
         app.MapIdentityApi<UserModel>();
         app.Run();
     }

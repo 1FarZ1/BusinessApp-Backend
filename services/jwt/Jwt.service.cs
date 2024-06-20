@@ -22,14 +22,26 @@ public class JwtService : IJwtService
         var tokenHandler = new JwtSecurityTokenHandler()
         ;
 
+        var roles = payload.roles;
+
+        foreach (var role in roles)
+        {
+            Console.WriteLine(role);
+        }
+     
         var key = Encoding.ASCII.GetBytes(jwtOptions.Secret);
 
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, payload.sub),
             new Claim(JwtRegisteredClaimNames.Email, payload.email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, payload.jti),
         };
+
+        foreach (var role in roles)
+        {
+                claims = claims.Append(new Claim(ClaimTypes.Role, role)).ToArray();
+            }
         int expireTimeMinutes = jwtOptions.ExpirationInMinutes ;
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -39,7 +51,6 @@ public class JwtService : IJwtService
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(expireTimeMinutes)),
             SigningCredentials = new SigningCredentials(
-                
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };

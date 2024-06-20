@@ -13,7 +13,6 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
-    // [Authorize]
     [HttpGet("")]
     public async Task<IActionResult> GetProducts(
         [FromQuery] int pageIndex = 1,
@@ -33,6 +32,7 @@ public class ProductController : ControllerBase
     }
 
     //search
+    [Authorize]
     [HttpGet("search")]
     public async Task<IActionResult> SearchProducts([FromQuery] string query)
     {
@@ -58,8 +58,8 @@ public class ProductController : ControllerBase
     
 
 
-    // [Authorize(policy: "Admin")]
-    [HttpPost]    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("")]   
     public async Task<IActionResult> AddProduct([FromBody] ProductDto product)
     {
         try
