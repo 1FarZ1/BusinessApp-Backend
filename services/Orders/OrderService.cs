@@ -50,9 +50,19 @@ public class OrderService : IOrderService
         return orders;
     }
 
-    public async Task<OrderModel?> GetOrderAsync(int id)
+    public async Task<GetOrderDto?> GetOrderAsync(int id)
     {
-        return await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
+        return await _context.Orders.
+            Select(p => new GetOrderDto
+            {
+                Id = p.Id,
+                Total = p.Total,
+                Status = (OrderStatus)p.OrderStatus,
+                username = p.User.UserName,
+                OrderDate = p.OrderDate,
+                NumberOfProducts = p.OrderItems.Count
+            }).
+        FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<GetOrderDto[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize)
@@ -137,23 +147,6 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
         // return await _context.Orders.AnyAsync(p => p.Id == orderId && p.User.SellerId == sellerId);
     }
 
-    public async Task<int> GetOrdersCountAsync()
-    {
-        return await _context.Orders.CountAsync();
-    }
-
-    public async Task<int> GetUserOrdersCountAsync(string userId)
-    {
-        return await _context.Orders.CountAsync(p => p.UserId == userId);
-    }
-
-    public async Task<int> GetSellerOrdersCountAsync(string sellerId)
-    {
-        //TODO
-        return 0;
-        // return await _context.Orders.CountAsync(p => p.User.SellerId == sellerId);
-    }
-    
 
 
     public async Task<bool> UpdateOrderStatusAsync(int id, OrderStatus status)
@@ -179,6 +172,7 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
                 }
                 break;
             case OrderStatus.Pending:
+                Console.WriteLine("Pending 11");
                 if (existingOrder.OrderStatus == OrderStatus.Shipped)
                 {
                     throw new InvalidOperationException("Cannot change status of shipped order");
@@ -193,6 +187,11 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
                 //TODO: add more cases for other status transitions
             ;
         }
+        Console.WriteLine("Order status updated");
+        Console.WriteLine(existingOrder.OrderStatus);
+
+        Console.WriteLine(status);
+
 
         existingOrder.OrderStatus = status;
 
@@ -216,7 +215,23 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
         return true;
     }
 
-    // public async Task<OrderModel[]> SearchOrdersAsync(string query)
+    public async Task<int> GetOrdersCountAsync()
+    {
+        return await _context.Orders.CountAsync();
+    }
+
+    public async Task<int> GetUserOrdersCountAsync(string userId)
+    {
+        return await _context.Orders.CountAsync(p => p.UserId == userId);
+    }
+
+    public async Task<int> GetSellerOrdersCountAsync(string sellerId)
+    {
+        //TODO
+        return 0;
+        // return await _context.Orders.CountAsync(p => p.User.SellerId == sellerId);
+    }
+    
 
 
 }

@@ -1,10 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-[Authorize] // Restrict access to authenticated users
+
+
+
+
+[Authorize] 
 [Route("api/[controller]")]
 [ApiController]
 public class OrderController : ControllerBase
@@ -123,22 +128,33 @@ public class OrderController : ControllerBase
         return NoContent();
     }
 
-    [Authorize(policy: "Seller")]
-    [HttpPut("update-status/{id}")]
-    public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] OrderStatus status)
-    {   
-        var sellerId = GetUserId();
+    [Authorize(policy: "User")]
+    [HttpPatch("update-status/{id}")]
+    public async Task<IActionResult> UpdateOrderStatus(
+        int id,
+        [FromBody]  ChangeStatusOrderDto dto)
+        {   
+
+      try{
+          var sellerId = GetUserId();
+
+        Console.WriteLine("status " + dto.Status);
         bool isSeller = await _orderService.OrderBelongsToSeller(id, sellerId);
         if (!isSeller)
         {
             return Unauthorized();
         }
 
-        bool isSuccess = await _orderService.UpdateOrderStatusAsync(id, status); 
+        bool isSuccess = await _orderService.UpdateOrderStatusAsync(id, dto.Status); 
         if (!isSuccess)
         {
             throw new Exception("Order status update failed");
         }
         return Ok("Order status updated successfully");
+      }
+        catch(Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

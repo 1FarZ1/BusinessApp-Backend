@@ -18,3 +18,10 @@ public class OrderItemDto
     public int ProductId { get; set; }
  
 }
+
+public class ChangeStatusOrderDto {
+
+    [Required]
+    [EnumDataType(typeof(OrderStatus))]
+    public required OrderStatus Status { get; set; }
+}

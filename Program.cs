@@ -4,6 +4,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -124,8 +125,15 @@ internal class Program
         {
             options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
             options.JsonSerializerOptions.WriteIndented = true;
-            options.JsonSerializerOptions.PropertyNamingPolicy = null;
-            
+            // options.JsonSerializerOptions.PropertyNamingPolicy = null;
+
+
+
+            //fuck you
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        
+
+
         });
 
 
