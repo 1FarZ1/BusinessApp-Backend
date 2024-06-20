@@ -21,11 +21,8 @@ public class OrderModel
     [Required]
     public decimal Total { get; set; }
 
-    [Required]
-    public required OrderItemModel[] OrderItems { get; set; }
-
-[DefaultValue("Pending")]
-    public string OrderStatus { get; set; } = "Pending";
+[DefaultValue(OrderStatus.Pending)]
+    public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
     [DefaultValue(typeof(DateTime), "")]
     public DateTime OrderDate { get; set; } = DateTime.Now;
@@ -34,7 +31,11 @@ public class OrderModel
     public required string UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public  UserModel User { get; set; }
+    public  virtual UserModel User { get; set; }
+
+
+    public virtual ICollection<OrderItemModel> OrderItems { get; set; } // Virtual navigation property
+
 
 
 }
@@ -56,13 +57,14 @@ public class OrderItemModel
     public int OrderId { get; set; }
 
     [ForeignKey("OrderId")]
-    public  OrderModel Order { get; set; }
+    public virtual OrderModel Order { get; set; } // Virtual navigation property
+
 
     [Required]
     public int ProductId { get; set; }
 
     [ForeignKey("ProductId")]
-    public  ProductModel Product { get; set; }
+    public virtual ProductModel Product { get; set; } // Virtual navigation property
 
     // [Required]
     // public decimal Price { get; set; }

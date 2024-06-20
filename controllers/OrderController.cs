@@ -47,7 +47,7 @@ public class OrderController : ControllerBase
     )
     {
 
-        var username = User.Identity.Name;
+        string? username = User.Identity.Name;
         Console.WriteLine(username);
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)

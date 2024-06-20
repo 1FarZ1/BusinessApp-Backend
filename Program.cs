@@ -39,7 +39,7 @@ internal class Program
             }
         );
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+            options.UseLazyLoadingProxies().UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
                 new MySqlServerVersion(new Version(8, 0, 21))));
 
         builder.Services.AddIdentity<UserModel, IdentityRole>()

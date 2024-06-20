@@ -26,10 +26,12 @@ public class ProductModel
     public decimal Price { get; set; }
 
     
+
+    [DataType(DataType.ImageUrl)]
     public string ImageUrl { get; set; }
 
 
-    public OrderItemModel[] OrderItems { get; set; }
+    public virtual ICollection<OrderItemModel> OrderItems { get; set; } // Virtual navigation property
 
     
 }

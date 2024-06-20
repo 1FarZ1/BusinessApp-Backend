@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[8.0.5, )"
             },
+            "Microsoft.EntityFrameworkCore.Proxies": {
+              "target": "Package",
+              "version": "[8.0.6, )"
+            },
             "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
               "version": "[7.5.2, )"

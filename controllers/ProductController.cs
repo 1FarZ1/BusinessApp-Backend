@@ -19,7 +19,7 @@ public class ProductController : ControllerBase
         [FromQuery] int pageSize = 10
     )
     {
-        ProductModel[]? products = await _productService.GetProductsAsync(
+        ProductViewModel[]? products = await _productService.GetProductsAsync(
             pageIndex,
             pageSize
         );
@@ -47,7 +47,7 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProduct(int id)
     {
-        ProductModel? product = await _productService.GetProductAsync(id);
+        ProductViewModel? product = await _productService.GetProductAsync(id);
         if (product == null)
         {
             return NotFound();

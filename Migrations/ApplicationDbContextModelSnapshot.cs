@@ -16,7 +16,10 @@ namespace test.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -176,7 +179,7 @@ namespace test.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItemModel");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("OrderModel", b =>
@@ -192,11 +195,10 @@ namespace test.Migrations
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("OrderStatus")
-                        .IsRequired()
+                    b.Property<int>("OrderStatus")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("longtext")
-                        .HasDefaultValue("Pending");
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(65,30)");

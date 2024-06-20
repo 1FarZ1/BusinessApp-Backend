@@ -5,8 +5,7 @@ public class UserModel : IdentityUser
 {
 
 
-    public OrderModel[] Orders { get; set; }
-
+    public virtual ICollection<OrderModel> Orders { get; set; } 
     // public string PhoneNumber { get; set; }
     // public string Address { get; set; }
     // public string City { get; set; }

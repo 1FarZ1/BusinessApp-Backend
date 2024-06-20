@@ -13,6 +13,15 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
     public DbSet<ProductModel> Products { get; set; }
     public DbSet<OrderModel> Orders { get; set; }
 
+    public DbSet<OrderItemModel> OrderItems { get; set; }
+
+
+       protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseLazyLoadingProxies(); // Enable lazy loading proxies
+        base.OnConfiguring(optionsBuilder);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder){
 
 
@@ -44,6 +53,7 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
 
             modelBuilder.Entity<OrderItemModel>(
                 entity => {
+                    entity.ToTable("OrderItems");
                     entity.HasKey(o => o.Id);
                     entity.Property(o => o.Id).ValueGeneratedOnAdd();
                     entity.Property(o => o.Quantity).IsRequired();

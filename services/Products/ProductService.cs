@@ -5,6 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 
+public class ProductViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+    public string ImageUrl { get; set; }
+}
+
+
 public class ProductService  : IProductService
 {
     private readonly ApplicationDbContext _context;
@@ -14,19 +24,35 @@ public class ProductService  : IProductService
         _context = context;
     }
 
- public async Task<ProductModel[]> GetProductsAsync(int pageIndex, int pageSize)
+ public async Task<ProductViewModel[]> GetProductsAsync(int pageIndex, int pageSize)
 {
     var products = await _context.Products
         .OrderBy(p => p.Name)
         .Skip((pageIndex - 1) * pageSize)
         .Take(pageSize)
+        .Select(p => new ProductViewModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            ImageUrl = p.ImageUrl
+        })
         .ToArrayAsync();
     return products;
 }
 
-    public async Task<ProductModel?> GetProductAsync(int id)
+    public async Task<ProductViewModel?> GetProductAsync(int id)
     {
-        return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        return await _context.Products.Select(p => new ProductViewModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            ImageUrl = p.ImageUrl
+        })
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<ProductModel> AddProductAsync( ProductDto productDto)
