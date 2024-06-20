@@ -55,10 +55,19 @@ public class OrderService : IOrderService
         return await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<OrderModel[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize)
+    public async Task<GetOrderDto[]> GetUserOrdersAsync(string userId, int pageIndex, int pageSize)
     {
-        OrderModel[]? orders = await _context.Orders
+        GetOrderDto[]? orders = await _context.Orders
             .Where(p => p.UserId == userId)
+            .Select(p => new GetOrderDto
+            {
+                Id = p.Id,
+                Total = p.Total,
+                Status = (OrderStatus)p.OrderStatus,
+                username = p.User.UserName,
+                OrderDate = p.OrderDate,
+                NumberOfProducts = p.OrderItems.Count
+            })
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToArrayAsync();
@@ -111,24 +120,41 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
         await transaction.RollbackAsync();
         throw;
     }
+
+
+
 }
 
-    // public async Task<OrderModel> UpdateOrderAsync(int id, OrderDto order)
-    // {
-    //     var existingOrder = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
-    //     if (existingOrder == null)
-    //     {
-    //         throw new Exception("Order not found");
-    //     }
+    public async Task<bool> OrderBelongsToUser(int orderId, string userId)
+    {
+        return await _context.Orders.AnyAsync(p => p.Id == orderId && p.UserId == userId);
+    }
 
-    //     existingOrder.Name = order.Name;
-    //     existingOrder.Description = order.Description;
-    //     existingOrder.Price = order.Price;
+    public async Task<bool> OrderBelongsToSeller(int orderId, string sellerId)
+    {   
+        //TODO
+        return false;
+        // return await _context.Orders.AnyAsync(p => p.Id == orderId && p.User.SellerId == sellerId);
+    }
 
-    //     await _context.SaveChangesAsync();
-    //     return existingOrder;
-    // }
 
+    public async Task<bool> UpdateOrderStatusAsync(int id, OrderStatus status)
+    {
+        var existingOrder = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);
+        if (existingOrder == null)
+        {
+            throw new Exception("Order not found");
+        }
+
+        existingOrder.OrderStatus = status;
+
+        await _context.SaveChangesAsync();
+        if (existingOrder.OrderStatus == status)
+        {
+            return true;
+        }
+        return false;
+    }
     public async Task<bool> DeleteOrderAsync(int id)
     {
         var existingOrder = await _context.Orders.FirstOrDefaultAsync(p => p.Id == id);

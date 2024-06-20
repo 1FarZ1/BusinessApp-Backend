@@ -16,9 +16,20 @@ public class OrderController : ControllerBase
         _orderService = orderService;
     }
 
+    // private methode to get the user id from the token
+    private string GetUserId()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+        if (userId == null)
+        {
+            throw new Exception("User not found");
+        }
 
-    [Authorize(policy: "User")]
+        return userId;
+    }
+
+    [Authorize(policy: "Admin")]
     [HttpGet("")]
     public async Task<IActionResult> GetOrders(
         [FromQuery] int pageIndex = 1,
@@ -30,10 +41,7 @@ public class OrderController : ControllerBase
             pageSize
             
         );
-        if (orders == null)
-        {
-            return NotFound();
-        }
+      
         return Ok(orders);
     }
 
@@ -45,26 +53,15 @@ public class OrderController : ControllerBase
         [FromQuery] int pageIndex = 1,
         [FromQuery] int pageSize = 10
     )
-    {
+    {//TODO"error handling
+       var userId = GetUserId();
 
-        string? username = User.Identity.Name;
-        Console.WriteLine(username);
-        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
-
-        // Console.
-        if (userId == null)
-        {
-            return Unauthorized();
-        }
-        OrderModel[]? orders = await _orderService.GetUserOrdersAsync(
+        GetOrderDto[]? orders = await _orderService.GetUserOrdersAsync(
             userId,
             pageIndex,
             pageSize
         );
-        if (orders == null)
-        {
-            return NotFound();
-        }
+        
         return Ok(orders);
     }
 
@@ -73,14 +70,13 @@ public class OrderController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrder(int id)
     {
-            // check if the user is the owner of the order
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
+
+        var userId = GetUserId();
+        bool isUserOrder = await _orderService.OrderBelongsToUser(id, userId);
+        if (!isUserOrder)
         {
             return Unauthorized();
         }
-
-        
 
         OrderModel? order = await _orderService.GetOrderAsync(id); 
         if (order == null)
@@ -96,23 +92,14 @@ public class OrderController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddOrder([FromBody] OrderDto order)
     {
-        // Retrieve the authenticated user's identifier
-        if (order == null)
-        {
-            return BadRequest();
-        }
 
         if ( order.OrderItems.Length == 0)
         {
             return BadRequest("Order must have at least one item");
         }
 
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userId == null)
-        {
-            return Unauthorized();
-        }
+       var userId = GetUserId();
+    
         OrderModel? newOrder = await _orderService.AddOrderAsync(order, userId); 
         if (newOrder == null)
         {
@@ -122,17 +109,36 @@ public class OrderController : ControllerBase
         return Ok("Order added successfully");
     }
 
+
+    [Authorize(policy: "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrder(int id)
     {
-        // Retrieve the authenticated user's identifier
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+       
         bool deleted = await _orderService.DeleteOrderAsync(id); 
         if (!deleted)
         {
             return NotFound();
         }
         return NoContent();
+    }
+
+    [Authorize(policy: "Seller")]
+    [HttpPut("update-status/{id}")]
+    public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] OrderStatus status)
+    {   
+        var sellerId = GetUserId();
+        bool isSeller = await _orderService.OrderBelongsToSeller(id, sellerId);
+        if (!isSeller)
+        {
+            return Unauthorized();
+        }
+
+        bool isSuccess = await _orderService.UpdateOrderStatusAsync(id, status); 
+        if (!isSuccess)
+        {
+            throw new Exception("Order status update failed");
+        }
+        return Ok("Order status updated successfully");
     }
 }
