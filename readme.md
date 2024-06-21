@@ -25,16 +25,14 @@
 - Reset Password
 - 2fa Authentication
 - Email Confirmation
+- Roles and Permissions [Admin, User,Seller]
 - Get User Profile
 - Update User Profile
-- Complex Get Products with Pagination, Filtering, Sorting, and Searching
-- Complex Get Orders with Pagination, Filtering, Sorting, and Searching
-- Crud Products
-- Crud Categories
-- Crud Orders
-- Crud Users
-- Crud Services
-- Cart System
+- Complex Products System Management
+- Complex Orders System Management
+- Reviews System
+- Categories and SubCategories System
+- Favorite Items System
 - Support and Ticket System
 
 ## Configuration
