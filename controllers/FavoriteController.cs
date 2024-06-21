@@ -35,7 +35,7 @@ public class FavoriteController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<IActionResult> GetFavorites(    )
+    public async Task<IActionResult> GetFavorites()
     {
         // GetFavoriteDto[]? favorites = await _favoriteService.GetFavoritesAsync(
             // pageIndex,

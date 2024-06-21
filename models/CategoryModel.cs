@@ -1,5 +1,8 @@
 
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 public class CategoryModel
 {
     public int Id { get; set; }
@@ -7,8 +10,11 @@ public class CategoryModel
     public string Description { get; set; }
     public string ImageUrl { get; set; }
 
-    public List<SubCategoryModel> SubCategories { get; set; }
-}
+
+
+    public virtual ICollection<SubCategoryModel> SubCategories { get; set; }
+    
+    }
 
 public class SubCategoryModel
 {
@@ -16,9 +22,16 @@ public class SubCategoryModel
     public string Name { get; set; }
     public string Description { get; set; }
     public string ImageUrl { get; set; }
-    public int CategoryId { get; set; }
-    public CategoryModel Category { get; set; }
-    public List<ProductModel> Products { get; set; }
 
-    
+
+    [Required]
+    public int CategoryId { get; set; }
+
+
+    [ForeignKey("CategoryId")]
+    public virtual CategoryModel Category { get; set; }
+
+    public virtual ICollection<ProductModel> Products { get; set; }
+
+
 }
