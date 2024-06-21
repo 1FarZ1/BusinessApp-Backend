@@ -36,7 +36,8 @@ public class SubCategoryDto
 
 public interface ICategoryService
 {
-    Task<List<CategoryModel>> GetCategoriesAsync();
+    Task<List<CategoryModel>> GetCategoriesAsync(
+        );
 
     Task<List<SubCategoryModel>> GetSubCategoriesAsync(int categoryId);
 
