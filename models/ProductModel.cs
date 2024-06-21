@@ -46,4 +46,6 @@ public class ProductModel
 
     public virtual ICollection<UserFavoriteModel> UserFavorites { get; set; } 
 
+
+    public virtual ICollection<ReviewModel> ProductReviews { get; set; }
 }

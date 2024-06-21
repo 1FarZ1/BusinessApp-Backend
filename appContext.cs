@@ -21,6 +21,10 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
 
     public DbSet<UserFavoriteModel> UserFavorites { get; set; }
 
+    public DbSet<ReviewModel> Reviews { get; set; }
+
+
+
        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLazyLoadingProxies(); // Enable lazy loading proxies
@@ -101,6 +105,19 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
                     entity.Property(u => u.ProductId).IsRequired();
                     entity.HasOne(u => u.User).WithMany(u => u.UserFavorites).HasForeignKey(u => u.UserId);
                     entity.HasOne(u => u.Product).WithMany(p => p.UserFavorites).HasForeignKey(u => u.ProductId);
+                }
+            );
+
+            modelBuilder.Entity<ReviewModel>(
+                entity => {
+                    entity.HasKey(r => r.Id);
+                    entity.Property(r => r.Id).ValueGeneratedOnAdd();
+                    entity.Property(r => r.UserId).IsRequired();
+                    entity.Property(r => r.ProductId).IsRequired();
+                    entity.Property(r => r.Rating).IsRequired();
+                    entity.Property(r => r.Comment).HasMaxLength(500);
+                    entity.HasOne(r => r.User).WithMany(u => u.Reviews).HasForeignKey(r => r.UserId);
+                    entity.HasOne(r => r.Product).WithMany(p => p.ProductReviews).HasForeignKey(r => r.ProductId);
                 }
             );
 
