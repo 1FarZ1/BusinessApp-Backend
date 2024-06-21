@@ -21,4 +21,7 @@ public class ProductDto
 
     public string? ImageUrl { get; set; }
 
+    [Required]
+    public int SubCategoryId { get; set; }
+
 }

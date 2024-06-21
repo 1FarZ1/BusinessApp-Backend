@@ -15,6 +15,9 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
 
     public DbSet<OrderItemModel> OrderItems { get; set; }
 
+    public DbSet<CategoryModel> Categories { get; set; }
+
+    public DbSet<SubCategoryModel> SubCategories { get; set; }
 
        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -63,6 +66,31 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
                     entity.HasOne(o => o.Order).WithMany(o => o.OrderItems).HasForeignKey(o => o.OrderId);
                 }
             );
+
+            modelBuilder.Entity<CategoryModel>(
+                entity => {
+                    entity.HasKey(c => c.Id);
+                    entity.Property(c => c.Id).ValueGeneratedOnAdd();
+                    entity.Property(c => c.Name).IsRequired().HasMaxLength(100);
+                    entity.Property(c => c.Description).IsRequired().HasMaxLength(500);
+                    entity.Property(c => c.ImageUrl).HasDefaultValue("https://via.placeholder.com/150");
+                    entity.HasMany(c => c.SubCategories).WithOne(s => s.Category).HasForeignKey(s => s.CategoryId);
+                }
+            );
+
+            modelBuilder.Entity<SubCategoryModel>(
+                entity => {
+                    entity.HasKey(s => s.Id);
+                    entity.Property(s => s.Id).ValueGeneratedOnAdd();
+                    entity.Property(s => s.Name).IsRequired().HasMaxLength(100);
+                    entity.Property(s => s.Description).IsRequired().HasMaxLength(500);
+                    entity.Property(s => s.ImageUrl).HasDefaultValue("https://via.placeholder.com/150");
+                    entity.Property(s => s.CategoryId).IsRequired();
+                    entity.HasOne(s => s.Category).WithMany(c => c.SubCategories).HasForeignKey(s => s.CategoryId);
+                    entity.HasMany(s => s.Products).WithOne(p => p.SubCategory).HasForeignKey(p => p.SubCategoryId);
+                }
+            );
+
             
             // modelBuilder.Entity<ProductModel>().Property(p => p.PictureUrl).IsRequired();
             // modelBuilder.Entity<ProductModel>().Property(p => p.Category).IsRequired();

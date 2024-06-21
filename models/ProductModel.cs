@@ -33,5 +33,12 @@ public class ProductModel
 
     public virtual ICollection<OrderItemModel> OrderItems { get; set; } // Virtual navigation property
 
+
+    [Required]
+    public int SubCategoryId { get; set; }
+
+
+    [ForeignKey("SubCategoryId")]
+    public virtual SubCategoryModel SubCategory { get; set; } // Virtual navigation property
     
 }
