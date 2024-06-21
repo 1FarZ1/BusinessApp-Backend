@@ -4,6 +4,7 @@
 
 ## Notes
 
+- There is Parts in The Sytem when it need Refectoring +  ReDesign , Will be Happy To hear Your Feedback and Suggestions
 - This Code Follows Solid Principles and Clean Architecture
 - Aims To Get the best practices in Asp.Net Core
 - Following Design Patterns such as Repository Pattern, Singleton Pattern, Factory Pattern, and Strategy Pattern, Options Pattern, and Mediator Pattern
