@@ -33,7 +33,7 @@
 - Reviews System
 - Categories and SubCategories System
 - Favorite Items System
-- Support and Ticket System
+- Services , Support and Ticket System [Pending]
 
 ## Configuration
 
