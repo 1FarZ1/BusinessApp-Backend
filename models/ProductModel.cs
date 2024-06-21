@@ -40,5 +40,10 @@ public class ProductModel
 
     [ForeignKey("SubCategoryId")]
     public virtual SubCategoryModel SubCategory { get; set; } // Virtual navigation property
-    
+
+
+
+
+    public virtual ICollection<UserFavoriteModel> UserFavorites { get; set; } 
+
 }

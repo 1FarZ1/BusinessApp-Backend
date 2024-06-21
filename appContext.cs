@@ -19,6 +19,8 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
 
     public DbSet<SubCategoryModel> SubCategories { get; set; }
 
+    public DbSet<UserFavoriteModel> UserFavorites { get; set; }
+
        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLazyLoadingProxies(); // Enable lazy loading proxies
@@ -88,6 +90,17 @@ public class ApplicationDbContext : IdentityDbContext<UserModel>
                     entity.Property(s => s.CategoryId).IsRequired();
                     entity.HasOne(s => s.Category).WithMany(c => c.SubCategories).HasForeignKey(s => s.CategoryId);
                     entity.HasMany(s => s.Products).WithOne(p => p.SubCategory).HasForeignKey(p => p.SubCategoryId);
+                }
+            );
+
+            modelBuilder.Entity<UserFavoriteModel>(
+                entity => {
+                    entity.HasKey(u => u.Id);
+                    entity.Property(u => u.Id).ValueGeneratedOnAdd();
+                    entity.Property(u => u.UserId).IsRequired();
+                    entity.Property(u => u.ProductId).IsRequired();
+                    entity.HasOne(u => u.User).WithMany(u => u.UserFavorites).HasForeignKey(u => u.UserId);
+                    entity.HasOne(u => u.Product).WithMany(p => p.UserFavorites).HasForeignKey(u => u.ProductId);
                 }
             );
 

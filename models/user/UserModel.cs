@@ -6,6 +6,12 @@ public class UserModel : IdentityUser
 
 
     public virtual ICollection<OrderModel> Orders { get; set; } 
+
+    // public virtual ICollection<ReviewModel> Reviews { get; set; }
+
+    public virtual ICollection<UserFavoriteModel> UserFavorites { get; set; }
+
+
     // public string PhoneNumber { get; set; }
     // public string Address { get; set; }
     // public string City { get; set; }
