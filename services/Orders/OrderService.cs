@@ -142,9 +142,8 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
 
     public async Task<bool> OrderBelongsToSeller(int orderId, string sellerId)
     {   
-        //TODO
+    
         return true;
-        // return await _context.Orders.AnyAsync(p => p.Id == orderId && p.User.SellerId == sellerId);
     }
 
 
@@ -184,7 +183,6 @@ public async Task<OrderModel> AddOrderAsync(OrderDto orderDto, string userId)
                     throw new InvalidOperationException("Cannot change status of shipped order");
                 }
                 break;
-                //TODO: add more cases for other status transitions
             ;
         }
         Console.WriteLine("Order status updated");
